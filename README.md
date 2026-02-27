@@ -43,15 +43,37 @@ policies:
       - if:
           grouping: "&google"
         then:
-          concurrency: 4
-          rate: 120/60
           properties:
             backoff-concurrency: 2
             backoff-rate: 10/3600
             backoff-ttl: 3600
     default:
-      concurrency: 2
-      rate: 30/60
+      properties:
+        backoff-concurrency: 1
+        backoff-rate: 5/3600
+        backoff-ttl: 3600
+  - fields:
+      - tenantid
+      - jobid
+      - grouping
+    default:
+      properties:
+        backoff-concurrency: 1
+        backoff-rate: 5/3600
+        backoff-ttl: 3600
+  - fields:
+      - tenantid
+      - localip
+      - grouping
+    default:
+      properties:
+        backoff-concurrency: 1
+        backoff-rate: 5/3600
+        backoff-ttl: 3600
+  - fields:
+      - localip
+      - remoteip
+    default:
       properties:
         backoff-concurrency: 1
         backoff-rate: 5/3600
