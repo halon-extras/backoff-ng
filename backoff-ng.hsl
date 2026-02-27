@@ -1,0 +1,179 @@
+import $smtpdapp from "plugin-config://smtpd-app.yaml";
+
+function backoff_enable($arguments, $message)
+{
+    global $smtpdapp;
+    $endpoint = "http://".$smtpdapp["address"].":".$smtpdapp["port"]."/v1/backoff";
+    $options = ["headers" => ["Content-Type: application/json", "Accept: application/json"], "extended_result" => true];
+    $payload = json_encode(["message" => $arguments["dsn"]["diagnosticcode"]]);
+    $response = http($endpoint, $options, [], $payload);
+    if (!$response["content"])
+        throw Exception("Failed to query API endpoint: ".$response);
+    $content = json_decode($response["content"]);
+    if (!$content)
+        throw Exception("Invalid JSON response: ".$response["content"]);
+    $content = $content[0];
+
+    // Abort early if no class, fields, actions or policies exist
+    if (!$content["class"] or !$content["fields"] or !$content["actions"] or !$arguments["policy"]["policies"]) {
+        return [];
+    }
+
+    // Find policy to enable based on fields
+    $policy = find_policy($arguments["policy"]["policies"], $content["fields"]);
+    if (!$policy) {
+        return [];
+    }
+
+    // Store field values in an easier to use format
+    $values = [
+        "localip" => $arguments["attempt"]["connection"]["localip"],
+        "remoteip" => $arguments["attempt"]["connection"]["remoteip"],
+        "remotemx" => $arguments["attempt"]["connection"]["remotemx"],
+        "recipientdomain" => $message["recipientaddress"]["domain"],
+        "jobid" => $message["jobid"],
+        "transportid" => $message["transportid"],
+        "grouping" => $arguments["grouping"],
+        "tenantid" => $message["tenantid"]
+    ];
+
+    $result = [];
+
+    // Skip policies that already have backoff enabled
+    if (isset($policy["tags"]) and array_includes(function ($tag) {
+        return $tag === "backoff" or $tag =~ #/^backoff-.+$/;
+    }, $policy["tags"])) {
+        continue;
+    }
+
+    // Set all field values in condition
+    $condition = [];
+    foreach ($policy["fields"] as $field) {
+        if ($values[$field] !== none) {
+            $condition[$field] = $values[$field];
+        }
+    }
+
+    // Skip policy if some values are missing
+    if (length($policy["fields"]) !== length($condition)) {
+        continue;
+    }
+
+    // Get values from properties
+    $properties = $policy["properties"];
+
+    // Suspend
+    if (array_includes("suspend", $content["actions"])) {
+        foreach (["backoff-".str_lower($content["class"])."-suspend", "backoff-suspend"] as $property) {
+            if ($properties[$property]) {
+                $options = [];
+                $options["tag"] = "backoff-".str_lower($content["class"]);
+                $options["properties"] = [
+                    ...$properties,
+                    "backoff-transactionid" => $message["id"]["transaction"],
+                    "backoff-ts" => time(),
+                    "backoff-diagnosticcode" => $arguments["dsn"]["diagnosticcode"]
+                ];
+                $ttl = number($properties[$property]);
+                queue_suspend($condition, $ttl, $options);
+                $result[] = [
+                    "type" => "suspend",
+                    "fields" => $condition,
+                    "ttl" => $ttl,
+                    "options" => $options
+                ];
+                break;
+            }
+        }
+    }
+
+    // Policy
+    $backoff = [];
+
+    if (array_includes("rate", $content["actions"])) {
+        foreach (["backoff-".str_lower($content["class"])."-rate", "backoff-rate"] as $property) {
+            if ($properties[$property]) {
+                if ($properties[$property] =~ #/\//) {
+                    $backoff["rate"] = array_map(number, str_split($properties[$property], "/"));
+                } else {
+                    $backoff["rate"] = [number($properties[$property]), 1];
+                }
+                break;
+            }
+        }
+    }
+
+    if (array_includes("concurrency", $content["actions"])) {
+        foreach (["backoff-".str_lower($content["class"])."-concurrency", "backoff-concurrency"] as $property) {
+            if ($properties[$property]) {
+                $backoff["concurrency"] = number($properties[$property]);
+                break;
+            }
+        }
+    }
+
+    if (array_includes("connectinterval", $content["actions"])) {
+        foreach (["backoff-".str_lower($content["class"])."-connectinterval", "backoff-connectinterval"] as $property) {
+            if ($properties[$property]) {
+                $backoff["connectinterval"] = number($properties[$property]);
+                break;
+            }
+        }
+    }
+
+    if (length($backoff) > 0) {
+        foreach (["backoff-".str_lower($content["class"])."-cluster", "backoff-cluster"] as $property) {
+            if (isset($properties[$property])) {
+                $backoff["cluster"] = str_lower($properties[$property]) === "false" ? false : true;
+                break;
+            }
+        }
+
+        // Enable policy if backoff values were found
+        foreach (["backoff-".str_lower($content["class"])."-ttl", "backoff-ttl"] as $property) {
+            if ($properties[$property]) {
+                $backoff["tag"] = "backoff-".str_lower($content["class"]); // Set backoff tag
+                // Set backoff properties
+                $backoff["properties"] = [
+                    ...$properties,
+                    "backoff-transactionid" => $message["id"]["transaction"],
+                    "backoff-ts" => time(),
+                    "backoff-diagnosticcode" => $arguments["dsn"]["diagnosticcode"]
+                ];
+                $ttl = number($properties[$property]);
+                queue_policy($policy["fields"], $condition, $backoff, $ttl, [
+                    "id" => uuidv5("34db7354-7119-45f8-8943-00457778972f", json_encode($condition)),
+                    "type" => "backoff",
+                    "update" => true
+                ]);
+                $result[] = [
+                    "type" => "policy",
+                    "fields" => $policy["fields"],
+                    "condition" => $condition,
+                    "backoff" => $backoff,
+                    "ttl" => $ttl
+                ];
+                break;
+            }
+        }
+    }
+
+    return $result;
+}
+
+function find_policy($policies, $fields) {
+    return array_find(function ($policy) closure($fields) {
+        $match = true;
+        if (length($policy["fields"]) === length($fields)) {
+            foreach ($fields as $field) {
+                if (!array_includes($field, $policy["fields"])) {
+                    $match = false;
+                    break;
+                }
+            }
+        } else {
+            $match = false;
+        }
+        return $match;
+    }, $policies);
+}

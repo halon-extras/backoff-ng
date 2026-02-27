@@ -1,0 +1,9 @@
+version: '6.10'
+servers:
+  - id: default
+    transport: mx
+plugins:
+  - id: backoff-ng
+    config:
+      address: "127.0.0.1"
+      port: 8080

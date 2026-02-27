@@ -1,0 +1,4 @@
+version: "6.10"
+policies:
+  - fields:
+    - localip

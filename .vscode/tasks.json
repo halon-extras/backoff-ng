@@ -1,0 +1,28 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "make",
+            "type": "shell",
+            "command": "mkdir -p ${workspaceFolder}/build/vscode && cd ${workspaceFolder}/build/vscode && echo -n \"DEB\" > ./CPACK_GENERATOR.txt && cmake ${workspaceFolder} && make",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "make install",
+            "type": "shell",
+            "command": "mkdir -p ${workspaceFolder}/build/vscode && cd ${workspaceFolder}/build/vscode && echo -n \"DEB\" > ./CPACK_GENERATOR.txt && cmake ${workspaceFolder} && make && make install",
+            "problemMatcher": []
+        },
+        {
+            "label": "test",
+            "dependsOn": ["make install"],
+            "type": "shell",
+            "command": "cd ${workspaceFolder}/.devcontainer/smtpd && /opt/halon/bin/halonconfig && /opt/halon/bin/hsh ./src/files/test.hsl",
+            "problemMatcher": []
+        }
+    ]
+}
