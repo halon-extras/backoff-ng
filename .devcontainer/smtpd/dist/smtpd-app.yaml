@@ -9,13 +9,14 @@ scripting:
       import { backoff_enable } from "extras://backoff-ng";
 
       // Test 1 (Default setting should match)
-      $expect = [
-          ["type"=>"policy",
-          "fields"=>["localip"],
-          "condition"=>["localip"=>"127.0.0.1"],
+      $expect = [[
+          "type"=>"policy",
+          "fields"=>["localip","remoteip"],
+          "condition"=>["localip"=>"127.0.0.1","remoteip"=>"127.0.0.1"],
           "backoff"=>[
               "rate"=>[1,60],
-              "tag"=>"backoff-graylisting",
+              "concurrency"=>1,
+              "tag"=>"backoff-rate_limit__server_busy",
               "properties"=>[
                   "backoff-rate"=>"1/60",
                   "backoff-concurrency"=>"1",
@@ -23,7 +24,7 @@ scripting:
                   "backoff-suspend"=>"1200",
                   "backoff-ttl"=>"3600",
                   "backoff-transactionid"=>"7b3ecee9-efaa-42ab-ac44-72834dd9b5f5",
-                  "backoff-diagnosticcode"=>"451 4.7.1 <bla.candy@fish.sk>: Recipient address rejected: Greylisting in effect, please come back later"
+                  "backoff-diagnosticcode"=>"451 4.7.1 busy try again later"
               ]
           ],
           "ttl"=>3600
@@ -33,8 +34,8 @@ scripting:
       $arguments["attempt"]["connection"]["localip"]  = "127.0.0.1";
       $arguments["attempt"]["connection"]["remoteip"] = "127.0.0.1";
       $arguments["attempt"]["connection"]["remotemx"] = "mx1.domain1.com";
-      $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 <bla.candy@fish.sk>: Recipient address rejected: Greylisting in effect, please come back later";
-      $arguments["policy"]["policies"][0]             = ["fields" => ["localip"], "properties" => ["backoff-rate" => "1/60", "backoff-concurrency" => "1", "backoff-connectinterval" => "10", "backoff-suspend" => "1200", "backoff-ttl" => "3600"]];
+      $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 busy try again later";
+      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff-rate" => "1/60", "backoff-concurrency" => "1", "backoff-connectinterval" => "10", "backoff-suspend" => "1200", "backoff-ttl" => "3600"]];
       $message["id"]["transaction"]                   = "7b3ecee9-efaa-42ab-ac44-72834dd9b5f5";
       $message["transportid"]                         = "transport1";
       $message["tenantid"]                            = "tenant1";
@@ -49,21 +50,21 @@ scripting:
       echo "Test 1:\tOK";
 
       // Test 2 (Specific class setting should match without default value)
-      $expect = [
-          ["type"=>"policy",
-          "fields"=>["localip"],
-          "condition"=>["localip"=>"127.0.0.1"],
+      $expect = [["type"=>"policy",
+          "fields"=>["localip","remoteip"],
+          "condition"=>["localip"=>"127.0.0.1","remoteip"=>"127.0.0.1"],
           "backoff"=>[
               "rate"=>[1,60],
-              "tag"=>"backoff-graylisting",
+              "concurrency"=>1,
+              "tag"=>"backoff-rate_limit__server_busy",
               "properties"=>[
-                  "backoff-graylisting-rate"=>"1/60",
-                  "backoff-graylisting-concurrency"=>"1",
-                  "backoff-graylisting-connectinterval"=>"10",
-                  "backoff-graylisting-suspend"=>"1200",
-                  "backoff-graylisting-ttl"=>"3600",
+                  "backoff-rate_limit__server_busy-rate"=>"1/60",
+                  "backoff-rate_limit__server_busy-concurrency"=>"1",
+                  "backoff-rate_limit__server_busy-connectinterval"=>"10",
+                  "backoff-rate_limit__server_busy-suspend"=>"1200",
+                  "backoff-rate_limit__server_busy-ttl"=>"3600",
                   "backoff-transactionid"=>"7b3ecee9-efaa-42ab-ac44-72834dd9b5f5",
-                  "backoff-diagnosticcode"=>"451 4.7.1 <bla.candy@fish.sk>: Recipient address rejected: Greylisting in effect, please come back later"
+                  "backoff-diagnosticcode"=>"451 4.7.1 busy try again later"
               ]
           ],
           "ttl"=>3600
@@ -73,8 +74,8 @@ scripting:
       $arguments["attempt"]["connection"]["localip"]  = "127.0.0.1";
       $arguments["attempt"]["connection"]["remoteip"] = "127.0.0.1";
       $arguments["attempt"]["connection"]["remotemx"] = "mx1.domain1.com";
-      $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 <bla.candy@fish.sk>: Recipient address rejected: Greylisting in effect, please come back later";
-      $arguments["policy"]["policies"][0]             = ["fields" => ["localip"], "properties" => ["backoff-graylisting-rate" => "1/60", "backoff-graylisting-concurrency" => "1", "backoff-graylisting-connectinterval" => "10", "backoff-graylisting-suspend" => "1200", "backoff-graylisting-ttl" => "3600"]];
+      $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 busy try again later";
+      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff-rate_limit__server_busy-rate" => "1/60", "backoff-rate_limit__server_busy-concurrency" => "1", "backoff-rate_limit__server_busy-connectinterval" => "10", "backoff-rate_limit__server_busy-suspend" => "1200", "backoff-rate_limit__server_busy-ttl" => "3600"]];
       $message["id"]["transaction"]                   = "7b3ecee9-efaa-42ab-ac44-72834dd9b5f5";
       $message["transportid"]                         = "transport1";
       $message["tenantid"]                            = "tenant1";
@@ -89,26 +90,26 @@ scripting:
       echo "Test 2:\tOK";
 
       // Test 3 (Specific class setting should override default setting)
-      $expect = [
-          ["type"=>"policy",
-          "fields"=>["localip"],
-          "condition"=>["localip"=>"127.0.0.1"],
+      $expect = [["type"=>"policy",
+          "fields"=>["localip","remoteip"],
+          "condition"=>["localip"=>"127.0.0.1","remoteip"=>"127.0.0.1"],
           "backoff"=>[
               "rate"=>[1,20],
-              "tag"=>"backoff-graylisting",
+              "concurrency"=>2,
+              "tag"=>"backoff-rate_limit__server_busy",
               "properties"=>[
-                  "backoff-graylisting-rate"=>"1/20",
-                  "backoff-graylisting-concurrency"=>"2",
-                  "backoff-graylisting-connectinterval"=>"20",
-                  "backoff-graylisting-suspend"=>"2400",
-                  "backoff-graylisting-ttl"=>"9600",
+                  "backoff-rate_limit__server_busy-rate"=>"1/20",
+                  "backoff-rate_limit__server_busy-concurrency"=>"2",
+                  "backoff-rate_limit__server_busy-connectinterval"=>"20",
+                  "backoff-rate_limit__server_busy-suspend"=>"2400",
+                  "backoff-rate_limit__server_busy-ttl"=>"9600",
                   "backoff-rate"=>"1/60",
                   "backoff-concurrency"=>"1",
                   "backoff-connectinterval"=>"10",
                   "backoff-suspend"=>"1200",
                   "backoff-ttl"=>"3600",
                   "backoff-transactionid"=>"7b3ecee9-efaa-42ab-ac44-72834dd9b5f5",
-                  "backoff-diagnosticcode"=>"451 4.7.1 <bla.candy@fish.sk>: Recipient address rejected: Greylisting in effect, please come back later"
+                  "backoff-diagnosticcode"=>"451 4.7.1 busy try again later"
               ]
           ],
           "ttl"=>9600
@@ -118,8 +119,8 @@ scripting:
       $arguments["attempt"]["connection"]["localip"]  = "127.0.0.1";
       $arguments["attempt"]["connection"]["remoteip"] = "127.0.0.1";
       $arguments["attempt"]["connection"]["remotemx"] = "mx1.domain1.com";
-      $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 <bla.candy@fish.sk>: Recipient address rejected: Greylisting in effect, please come back later";
-      $arguments["policy"]["policies"][0]             = ["fields" => ["localip"], "properties" => ["backoff-graylisting-rate" => "1/20", "backoff-graylisting-concurrency" => "2", "backoff-graylisting-connectinterval" => "20", "backoff-graylisting-suspend" => "2400", "backoff-graylisting-ttl" => "9600", "backoff-rate" => "1/60", "backoff-concurrency" => "1", "backoff-connectinterval" => "10", "backoff-suspend" => "1200", "backoff-ttl" => "3600"]];
+      $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 busy try again later";
+      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff-rate_limit__server_busy-rate" => "1/20", "backoff-rate_limit__server_busy-concurrency" => "2", "backoff-rate_limit__server_busy-connectinterval" => "20", "backoff-rate_limit__server_busy-suspend" => "2400", "backoff-rate_limit__server_busy-ttl" => "9600", "backoff-rate" => "1/60", "backoff-concurrency" => "1", "backoff-connectinterval" => "10", "backoff-suspend" => "1200", "backoff-ttl" => "3600"]];
       $message["id"]["transaction"]                   = "7b3ecee9-efaa-42ab-ac44-72834dd9b5f5";
       $message["transportid"]                         = "transport1";
       $message["tenantid"]                            = "tenant1";
@@ -140,8 +141,8 @@ scripting:
       $arguments["attempt"]["connection"]["localip"]  = "127.0.0.1";
       $arguments["attempt"]["connection"]["remoteip"] = "127.0.0.1";
       $arguments["attempt"]["connection"]["remotemx"] = "mx1.domain1.com";
-      $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 <bla.candy@fish.sk>: Recipient address rejected: Greylisting in effect, please come back later";
-      $arguments["policy"]["policies"][0]             = ["fields" => ["localip"], "properties" => ["backoff-protocol_error-rate" => "1/20", "backoff-protocol_error-concurrency" => "2", "backoff-protocol_error-connectinterval" => "20", "backoff-protocol_error-suspend" => "2400", "backoff-protocol_error-ttl" => "9600"]];
+      $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 busy try again later";
+      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff-protocol_error-rate" => "1/20", "backoff-protocol_error-concurrency" => "2", "backoff-protocol_error-connectinterval" => "20", "backoff-protocol_error-suspend" => "2400", "backoff-protocol_error-ttl" => "9600"]];
       $message["id"]["transaction"]                   = "7b3ecee9-efaa-42ab-ac44-72834dd9b5f5";
       $message["transportid"]                         = "transport1";
       $message["tenantid"]                            = "tenant1";
@@ -156,22 +157,22 @@ scripting:
       echo "Test 4:\tOK";
 
       // Test 5 (Partial override of default settings)
-      $expect = [
-          ["type"=>"policy",
-          "fields"=>["localip"],
-          "condition"=>["localip"=>"127.0.0.1"],
+      $expect = [["type"=>"policy",
+          "fields"=>["localip","remoteip"],
+          "condition"=>["localip"=>"127.0.0.1","remoteip"=>"127.0.0.1"],
           "backoff"=>[
               "rate"=>[1,20],
-              "tag"=>"backoff-graylisting",
+              "concurrency"=>1,
+              "tag"=>"backoff-rate_limit__server_busy",
               "properties"=>[
-                  "backoff-graylisting-rate"=>"1/20",
+                  "backoff-rate_limit__server_busy-rate"=>"1/20",
                   "backoff-rate"=>"1/60",
                   "backoff-concurrency"=>"1",
                   "backoff-connectinterval"=>"10",
                   "backoff-suspend"=>"1200",
                   "backoff-ttl"=>"3600",
                   "backoff-transactionid"=>"7b3ecee9-efaa-42ab-ac44-72834dd9b5f5",
-                  "backoff-diagnosticcode"=>"451 4.7.1 <bla.candy@fish.sk>: Recipient address rejected: Greylisting in effect, please come back later"
+                  "backoff-diagnosticcode"=>"451 4.7.1 busy try again later"
               ]
           ],
           "ttl"=>3600
@@ -181,8 +182,8 @@ scripting:
       $arguments["attempt"]["connection"]["localip"]  = "127.0.0.1";
       $arguments["attempt"]["connection"]["remoteip"] = "127.0.0.1";
       $arguments["attempt"]["connection"]["remotemx"] = "mx1.domain1.com";
-      $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 <bla.candy@fish.sk>: Recipient address rejected: Greylisting in effect, please come back later";
-      $arguments["policy"]["policies"][0]             = ["fields" => ["localip"], "properties" => ["backoff-graylisting-rate" => "1/20", "backoff-rate" => "1/60", "backoff-concurrency" => "1", "backoff-connectinterval" => "10", "backoff-suspend" => "1200", "backoff-ttl" => "3600"]];
+      $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 busy try again later";
+      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff-rate_limit__server_busy-rate" => "1/20", "backoff-rate" => "1/60", "backoff-concurrency" => "1", "backoff-connectinterval" => "10", "backoff-suspend" => "1200", "backoff-ttl" => "3600"]];
       $message["id"]["transaction"]                   = "7b3ecee9-efaa-42ab-ac44-72834dd9b5f5";
       $message["transportid"]                         = "transport1";
       $message["tenantid"]                            = "tenant1";

@@ -1,4 +1,16 @@
 policies:
 - fields:
   - localip
+  - grouping
+- fields:
+  - tenantid
+  - jobid
+  - grouping
+- fields:
+  - tenantid
+  - localip
+  - grouping
+- fields:
+  - localip
+  - remoteip
 version: '6.10'
