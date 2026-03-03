@@ -1,0 +1,22 @@
+[
+    {
+        "name": "backoff_enable",
+        "parameters": {
+            "required": [
+                {
+                    "name": "arguments",
+                    "type": "array"
+                },
+                {
+                    "name": "message",
+                    "type": "array"
+                }
+            ]
+        },
+        "returnType": "array",
+        "detail": "backoff_enable(array $arguments, array $message): array",
+        "value": "backoff_enable($0)",
+        "documentation": "Enable backoff mode if bounce pattern matches.",
+        "link": "[Full documentation](https://github.com/halon-extras/backoff-ng)"
+    }
+]

@@ -15,6 +15,7 @@ INSTALL(FILES "LICENSE" DESTINATION "share/doc/plugins/hsl/${PROJECT_NAME}")
 INSTALL(FILES "backoff-ng-app.schema.json" DESTINATION "share/plugins/")
 INSTALL(FILES "backoff-ng.hsl" DESTINATION "plugins/hsl/${PROJECT_NAME}")
 INSTALL(FILES "main.hsl" DESTINATION "plugins/hsl/${PROJECT_NAME}")
+INSTALL(FILES ${PROJECT_NAME}.functions.json DESTINATION share/plugins)
 
 IF (CPACK_GENERATOR MATCHES "DEB")
 	SET(CPACK_DEBIAN_PACKAGE_DEPENDS "halon (>= 6.10)")
