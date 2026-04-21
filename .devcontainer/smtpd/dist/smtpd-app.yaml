@@ -6,7 +6,7 @@ plugins:
 scripting:
   files:
   - data: |
-      import { backoff_enable } from "extras://backoff-ng";
+      import { enable_backoff } from "extras://backoff-ng";
 
       // Test 1 (Default setting should match)
       $expect = [[
@@ -42,7 +42,7 @@ scripting:
       $message["jobid"]                               = "jobid1";
       $message["recipientaddress"]["domain"]          = "domain1.com";
 
-      $result = backoff_enable($arguments, $message);
+      $result = enable_backoff($arguments, $message);
       unset($result[0]["backoff"]["properties"]["backoff-ts"]);
 
       if (json_encode($result) !== json_encode($expect))
@@ -82,7 +82,7 @@ scripting:
       $message["jobid"]                               = "jobid1";
       $message["recipientaddress"]["domain"]          = "domain1.com";
 
-      $result = backoff_enable($arguments, $message);
+      $result = enable_backoff($arguments, $message);
       unset($result[0]["backoff"]["properties"]["backoff-ts"]);
 
       if (json_encode($result) !== json_encode($expect))
@@ -127,7 +127,7 @@ scripting:
       $message["jobid"]                               = "jobid1";
       $message["recipientaddress"]["domain"]          = "domain1.com";
 
-      $result = backoff_enable($arguments, $message);
+      $result = enable_backoff($arguments, $message);
       unset($result[0]["backoff"]["properties"]["backoff-ts"]);
 
       if (json_encode($result) !== json_encode($expect))
@@ -149,7 +149,7 @@ scripting:
       $message["jobid"]                               = "jobid1";
       $message["recipientaddress"]["domain"]          = "domain1.com";
 
-      $result = backoff_enable($arguments, $message);
+      $result = enable_backoff($arguments, $message);
       unset($result[0]["backoff"]["properties"]["backoff-ts"]);
 
       if (json_encode($result) !== json_encode($expect))
@@ -190,7 +190,7 @@ scripting:
       $message["jobid"]                               = "jobid1";
       $message["recipientaddress"]["domain"]          = "domain1.com";
 
-      $result = backoff_enable($arguments, $message);
+      $result = enable_backoff($arguments, $message);
       unset($result[0]["backoff"]["properties"]["backoff-ts"]);
 
       if (json_encode($result) !== json_encode($expect))

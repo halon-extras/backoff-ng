@@ -1,6 +1,6 @@
 import $smtpdapp from "plugin-config://smtpd-app.yaml";
 
-function backoff_enable($arguments, $message)
+function enable_backoff($arguments, $message)
 {
     global $smtpdapp;
     $endpoint = "http://".$smtpdapp["address"].":".$smtpdapp["port"]."/v1/backoff";
