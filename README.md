@@ -91,9 +91,9 @@ policies:
 You can also add overrides for specific [classifications](https://docs.halon.io/bounce-classifier/api.html) like this:
 
 ```
-backoff-rate_limit__server_busy-rate-concurrency: 2
-backoff-rate_limit__server_busy-rate-rate: 10/3600
-backoff-rate_limit__server_busy-rate-ttl: 3600
+backoff[rate_limit__server_busy-rate]-concurrency: 2
+backoff[rate_limit__server_busy-rate]-rate: 10/3600
+backoff[rate_limit__server_busy-rate]-ttl: 3600
 ```
 
 ## Exported functions

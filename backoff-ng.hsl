@@ -62,15 +62,17 @@ function enable_backoff($arguments, $message)
     // Get values from properties
     $properties = $policy["properties"];
 
+    $namespace = "backoff[".str_lower($content["class"])."]";
+
     // Create tag
-    $tag = "backoff-".str_lower($content["class"]);
+    $tag = "backoff-".str_lower($content["class"]); // "[]" not supported in tag names
     if (length(($tag)) > 32) {
         $tag = $tag[:29]."...";
     }
 
     // Suspend
     if (array_includes("suspend", $content["actions"])) {
-        foreach (["backoff-".str_lower($content["class"])."-suspend", "backoff-suspend"] as $property) {
+        foreach ([$namespace."-suspend", "backoff-suspend"] as $property) {
             if ($properties[$property]) {
                 $options = [];
                 $options["tag"] = $tag;
@@ -97,7 +99,7 @@ function enable_backoff($arguments, $message)
     $backoff = [];
 
     if (array_includes("rate", $content["actions"])) {
-        foreach (["backoff-".str_lower($content["class"])."-rate", "backoff-rate"] as $property) {
+        foreach ([$namespace."-rate", "backoff-rate"] as $property) {
             if ($properties[$property]) {
                 if ($properties[$property] =~ #/\//) {
                     $backoff["rate"] = array_map(number, str_split($properties[$property], "/"));
@@ -110,7 +112,7 @@ function enable_backoff($arguments, $message)
     }
 
     if (array_includes("concurrency", $content["actions"])) {
-        foreach (["backoff-".str_lower($content["class"])."-concurrency", "backoff-concurrency"] as $property) {
+        foreach ([$namespace."-concurrency", "backoff-concurrency"] as $property) {
             if ($properties[$property]) {
                 $backoff["concurrency"] = number($properties[$property]);
                 break;
@@ -119,7 +121,7 @@ function enable_backoff($arguments, $message)
     }
 
     if (array_includes("connectinterval", $content["actions"])) {
-        foreach (["backoff-".str_lower($content["class"])."-connectinterval", "backoff-connectinterval"] as $property) {
+        foreach ([$namespace."-connectinterval", "backoff-connectinterval"] as $property) {
             if ($properties[$property]) {
                 $backoff["connectinterval"] = number($properties[$property]);
                 break;
@@ -128,7 +130,7 @@ function enable_backoff($arguments, $message)
     }
 
     if (length($backoff) > 0) {
-        foreach (["backoff-".str_lower($content["class"])."-cluster", "backoff-cluster"] as $property) {
+        foreach ([$namespace."-cluster", "backoff-cluster"] as $property) {
             if (isset($properties[$property])) {
                 $backoff["cluster"] = str_lower($properties[$property]) === "false" ? false : true;
                 break;
@@ -136,7 +138,7 @@ function enable_backoff($arguments, $message)
         }
 
         // Enable policy if backoff values were found
-        foreach (["backoff-".str_lower($content["class"])."-ttl", "backoff-ttl"] as $property) {
+        foreach ([$namespace."-ttl", "backoff-ttl"] as $property) {
             if ($properties[$property]) {
                 $backoff["tag"] = $tag;
                 // Set backoff properties

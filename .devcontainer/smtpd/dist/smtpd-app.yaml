@@ -58,11 +58,11 @@ scripting:
               "concurrency"=>1,
               "tag"=>"backoff-rate_limit__server_busy",
               "properties"=>[
-                  "backoff-rate_limit__server_busy-rate"=>"1/60",
-                  "backoff-rate_limit__server_busy-concurrency"=>"1",
-                  "backoff-rate_limit__server_busy-connectinterval"=>"10",
-                  "backoff-rate_limit__server_busy-suspend"=>"1200",
-                  "backoff-rate_limit__server_busy-ttl"=>"3600",
+                  "backoff[rate_limit__server_busy]-rate"=>"1/60",
+                  "backoff[rate_limit__server_busy]-concurrency"=>"1",
+                  "backoff[rate_limit__server_busy]-connectinterval"=>"10",
+                  "backoff[rate_limit__server_busy]-suspend"=>"1200",
+                  "backoff[rate_limit__server_busy]-ttl"=>"3600",
                   "backoff-transactionid"=>"7b3ecee9-efaa-42ab-ac44-72834dd9b5f5",
                   "backoff-diagnosticcode"=>"451 4.7.1 busy try again later"
               ]
@@ -75,7 +75,7 @@ scripting:
       $arguments["attempt"]["connection"]["remoteip"] = "127.0.0.1";
       $arguments["attempt"]["connection"]["remotemx"] = "mx1.domain1.com";
       $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 busy try again later";
-      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff-rate_limit__server_busy-rate" => "1/60", "backoff-rate_limit__server_busy-concurrency" => "1", "backoff-rate_limit__server_busy-connectinterval" => "10", "backoff-rate_limit__server_busy-suspend" => "1200", "backoff-rate_limit__server_busy-ttl" => "3600"]];
+      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff[rate_limit__server_busy]-rate" => "1/60", "backoff[rate_limit__server_busy]-concurrency" => "1", "backoff[rate_limit__server_busy]-connectinterval" => "10", "backoff[rate_limit__server_busy]-suspend" => "1200", "backoff[rate_limit__server_busy]-ttl" => "3600"]];
       $message["id"]["transaction"]                   = "7b3ecee9-efaa-42ab-ac44-72834dd9b5f5";
       $message["transportid"]                         = "transport1";
       $message["tenantid"]                            = "tenant1";
@@ -98,11 +98,11 @@ scripting:
               "concurrency"=>2,
               "tag"=>"backoff-rate_limit__server_busy",
               "properties"=>[
-                  "backoff-rate_limit__server_busy-rate"=>"1/20",
-                  "backoff-rate_limit__server_busy-concurrency"=>"2",
-                  "backoff-rate_limit__server_busy-connectinterval"=>"20",
-                  "backoff-rate_limit__server_busy-suspend"=>"2400",
-                  "backoff-rate_limit__server_busy-ttl"=>"9600",
+                  "backoff[rate_limit__server_busy]-rate"=>"1/20",
+                  "backoff[rate_limit__server_busy]-concurrency"=>"2",
+                  "backoff[rate_limit__server_busy]-connectinterval"=>"20",
+                  "backoff[rate_limit__server_busy]-suspend"=>"2400",
+                  "backoff[rate_limit__server_busy]-ttl"=>"9600",
                   "backoff-rate"=>"1/60",
                   "backoff-concurrency"=>"1",
                   "backoff-connectinterval"=>"10",
@@ -120,7 +120,7 @@ scripting:
       $arguments["attempt"]["connection"]["remoteip"] = "127.0.0.1";
       $arguments["attempt"]["connection"]["remotemx"] = "mx1.domain1.com";
       $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 busy try again later";
-      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff-rate_limit__server_busy-rate" => "1/20", "backoff-rate_limit__server_busy-concurrency" => "2", "backoff-rate_limit__server_busy-connectinterval" => "20", "backoff-rate_limit__server_busy-suspend" => "2400", "backoff-rate_limit__server_busy-ttl" => "9600", "backoff-rate" => "1/60", "backoff-concurrency" => "1", "backoff-connectinterval" => "10", "backoff-suspend" => "1200", "backoff-ttl" => "3600"]];
+      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff[rate_limit__server_busy]-rate" => "1/20", "backoff[rate_limit__server_busy]-concurrency" => "2", "backoff[rate_limit__server_busy]-connectinterval" => "20", "backoff[rate_limit__server_busy]-suspend" => "2400", "backoff[rate_limit__server_busy]-ttl" => "9600", "backoff-rate" => "1/60", "backoff-concurrency" => "1", "backoff-connectinterval" => "10", "backoff-suspend" => "1200", "backoff-ttl" => "3600"]];
       $message["id"]["transaction"]                   = "7b3ecee9-efaa-42ab-ac44-72834dd9b5f5";
       $message["transportid"]                         = "transport1";
       $message["tenantid"]                            = "tenant1";
@@ -142,7 +142,7 @@ scripting:
       $arguments["attempt"]["connection"]["remoteip"] = "127.0.0.1";
       $arguments["attempt"]["connection"]["remotemx"] = "mx1.domain1.com";
       $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 busy try again later";
-      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff-protocol_error-rate" => "1/20", "backoff-protocol_error-concurrency" => "2", "backoff-protocol_error-connectinterval" => "20", "backoff-protocol_error-suspend" => "2400", "backoff-protocol_error-ttl" => "9600"]];
+      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff[protocol_error]-rate" => "1/20", "backoff[protocol_error]-concurrency" => "2", "backoff[protocol_error]-connectinterval" => "20", "backoff[protocol_error]-suspend" => "2400", "backoff[protocol_error]-ttl" => "9600"]];
       $message["id"]["transaction"]                   = "7b3ecee9-efaa-42ab-ac44-72834dd9b5f5";
       $message["transportid"]                         = "transport1";
       $message["tenantid"]                            = "tenant1";
@@ -165,7 +165,7 @@ scripting:
               "concurrency"=>1,
               "tag"=>"backoff-rate_limit__server_busy",
               "properties"=>[
-                  "backoff-rate_limit__server_busy-rate"=>"1/20",
+                  "backoff[rate_limit__server_busy]-rate"=>"1/20",
                   "backoff-rate"=>"1/60",
                   "backoff-concurrency"=>"1",
                   "backoff-connectinterval"=>"10",
@@ -183,7 +183,7 @@ scripting:
       $arguments["attempt"]["connection"]["remoteip"] = "127.0.0.1";
       $arguments["attempt"]["connection"]["remotemx"] = "mx1.domain1.com";
       $arguments["dsn"]["diagnosticcode"]             = "451 4.7.1 busy try again later";
-      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff-rate_limit__server_busy-rate" => "1/20", "backoff-rate" => "1/60", "backoff-concurrency" => "1", "backoff-connectinterval" => "10", "backoff-suspend" => "1200", "backoff-ttl" => "3600"]];
+      $arguments["policy"]["policies"][0]             = ["fields" => ["localip", "remoteip"], "properties" => ["backoff[rate_limit__server_busy]-rate" => "1/20", "backoff-rate" => "1/60", "backoff-concurrency" => "1", "backoff-connectinterval" => "10", "backoff-suspend" => "1200", "backoff-ttl" => "3600"]];
       $message["id"]["transaction"]                   = "7b3ecee9-efaa-42ab-ac44-72834dd9b5f5";
       $message["transportid"]                         = "transport1";
       $message["tenantid"]                            = "tenant1";
