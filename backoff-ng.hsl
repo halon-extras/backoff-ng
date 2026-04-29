@@ -62,12 +62,18 @@ function enable_backoff($arguments, $message)
     // Get values from properties
     $properties = $policy["properties"];
 
+    // Create tag
+    $tag = "backoff-".str_lower($content["class"]);
+    if (length(($tag)) > 32) {
+        $tag = $tag[:29]."...";
+    }
+
     // Suspend
     if (array_includes("suspend", $content["actions"])) {
         foreach (["backoff-".str_lower($content["class"])."-suspend", "backoff-suspend"] as $property) {
             if ($properties[$property]) {
                 $options = [];
-                $options["tag"] = "backoff-".str_lower($content["class"]);
+                $options["tag"] = $tag;
                 $options["properties"] = [
                     ...$properties,
                     "backoff-transactionid" => $message["id"]["transaction"],
@@ -132,7 +138,7 @@ function enable_backoff($arguments, $message)
         // Enable policy if backoff values were found
         foreach (["backoff-".str_lower($content["class"])."-ttl", "backoff-ttl"] as $property) {
             if ($properties[$property]) {
-                $backoff["tag"] = "backoff-".str_lower($content["class"]); // Set backoff tag
+                $backoff["tag"] = $tag;
                 // Set backoff properties
                 $backoff["properties"] = [
                     ...$properties,
