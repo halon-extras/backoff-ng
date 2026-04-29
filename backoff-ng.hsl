@@ -43,7 +43,7 @@ function enable_backoff($arguments, $message)
     if (isset($policy["tags"]) and array_includes(function ($tag) {
         return $tag === "backoff" or $tag =~ #/^backoff-.+$/;
     }, $policy["tags"])) {
-        continue;
+        return [];
     }
 
     // Set all field values in condition
@@ -56,7 +56,7 @@ function enable_backoff($arguments, $message)
 
     // Skip policy if some values are missing
     if (length($policy["fields"]) !== length($condition)) {
-        continue;
+        return [];
     }
 
     // Get values from properties
